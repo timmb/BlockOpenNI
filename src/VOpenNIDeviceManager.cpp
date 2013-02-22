@@ -86,6 +86,15 @@ namespace V
 		
 		// Tells us if generators have started
 		_isStarted = false;
+		
+		xn::Version version = xn::Version::Current();
+		std::stringstream s;
+		s << "openni driver version: "
+			<< (int)version.Major() << "."
+			<< (int)version.Minor() << "."
+			<< (int)version.Maintenance() << "."
+			<< (int)version.Build() << std::endl;
+		DEBUG_MESSAGE(s.str().c_str());
 	}
 
 	
