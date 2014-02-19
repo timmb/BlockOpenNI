@@ -9,3 +9,5 @@ samples/BlockOpenNISkeleton/xcode/BlockOpenNISkeleton.xcodeproj/project.xcworksp
 /samples/BlockOpenNISkeleton/vc10/Debug
 /samples/BlockOpenNISkeleton/vc10/ipch
 /samples/BlockOpenNISkeleton/vc10/Release
+
+.DS_Store
