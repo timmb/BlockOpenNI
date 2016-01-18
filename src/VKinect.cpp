@@ -1,5 +1,5 @@
 #include "VKinect.h"
-#include "cinder/app/AppBasic.h"
+#include "cinder/app/AppBase.h"
 #include <boost/foreach.hpp>
 
 using namespace ci;
@@ -20,21 +20,21 @@ Kinect::~Kinect()
 
 void Kinect::setup()
 {
-    setup(Vec2i(640, 480));
+    setup(ivec2(640, 480));
 }
 
-void Kinect::setup(const Vec2i & size)
+void Kinect::setup(const ivec2 & size)
 {
     setup(size, size, NODE_TYPE_IMAGE | NODE_TYPE_DEPTH | NODE_TYPE_SCENE | NODE_TYPE_USER);
 }
 
-void Kinect::setup(const Vec2i & size, int nodeTypeFlags)
+void Kinect::setup(const ivec2 & size, int nodeTypeFlags)
 {
     setup(size, size, nodeTypeFlags);
 }
 
     
-void Kinect::setup(const Vec2i & _depthSize, const Vec2i & _colorSize, int nodeTypeFlags)
+void Kinect::setup(const ivec2 & _depthSize, const ivec2 & _colorSize, int nodeTypeFlags)
 {
     depthSize = _depthSize;
     colorSize = _colorSize;
@@ -54,8 +54,8 @@ void Kinect::setup(const Vec2i & _depthSize, const Vec2i & _colorSize, int nodeT
     device->addListener(this);
     
     pixels = new uint16_t[depthSize.x * depthSize.y];
-    tex_Color = gl::Texture(colorSize.x, colorSize.y);
-    tex_Depth = gl::Texture(depthSize.x, depthSize.y);
+    tex_Color = gl::Texture::create(colorSize.x, colorSize.y);
+    tex_Depth = gl::Texture::create(depthSize.x, depthSize.y);
     
     manager->start();
 }
@@ -67,15 +67,15 @@ void Kinect::update()
     }
     
     if ( device->_isImageOn && device->getImageGenerator()->IsValid() && device->isImageDataNew() )
-        tex_Color.update(Surface(getColorImage()));
+        tex_Color->update(Surface(getColorImage()));
     if ( device->_isDepthOn && device->getDepthGenerator()->IsValid() && device->isDepthDataNew() )
         isDepthMapRealWorldUpdated = false;
-        tex_Depth.update(Surface(getDepthImage()));
+        tex_Depth->update(Surface(getDepthImage()));
     
     if ( device->_isUserOn && device->getUserGenerator()->IsValid() && device->isUserDataNew() ) {
         BOOST_FOREACH(users_map::value_type &user, users)
         {
-            user.second.texture.update(Surface(getUserImage(user.first)));
+            user.second.texture->update(Surface(getUserImage(user.first)));
         }
     }
 }
@@ -107,7 +107,7 @@ void Kinect::drawSkeletons( const Rectf & rect, float depth, float pointRadius, 
     gl::disable( GL_TEXTURE_2D );
     
     gl::pushMatrices();
-    gl::translate(Vec2f(rect.x1, rect.y1));
+    gl::translate(vec2(rect.x1, rect.y1));
     manager->renderJoints(rect.getWidth(),
                           rect.getHeight(),
                           depth,
@@ -167,7 +167,7 @@ XnPoint3D * Kinect::getDepthMapRealWorld()
     }
 }
     
-ColorA8u Kinect::getColorPixel(Vec2i pixel)
+ColorA8u Kinect::getColorPixel(ivec2 pixel)
 {
     uint8_t *r = device->getColorMap() + (pixel.x + pixel.y * colorSize.y);
     return ColorA8u(*r, *(r + 1), *(r + 2));
@@ -188,10 +188,10 @@ OpenNIUserRef Kinect::User::getOpenNIUser() const
     return kinect.manager->getUser(id);
 }
 
-Vec3f Kinect::User::getCenterOfMass( bool doProjectiveCoords ) const
+vec3 Kinect::User::getCenterOfMass( bool doProjectiveCoords ) const
 {
     float * center = getOpenNIUser()->getCenterOfMass(doProjectiveCoords);
-    return ci::Vec3f(center[0], center[1], center[2]);
+    return ci::vec3(center[0], center[1], center[2]);
 };
 
 } // end namespace V

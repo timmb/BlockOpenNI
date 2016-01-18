@@ -597,6 +597,7 @@ namespace V
 
 	void OpenNIUser::renderJoints( float width, float height, float depth, float pointSize, bool renderDepth )
 	{
+        
 		if( mUserState == USER_TRACKING )
 		{
 			DepthGenerator* depthGen = _device->getDepthGenerator();
@@ -615,62 +616,63 @@ namespace V
 
 			
 			
+            // TODO: Update to work with modern GL
 			//
-			// Old OpenGL rendering method. it's fine for now.
-			//
-			glBegin( GL_QUADS );
-			int index = 1;
-			for( std::vector<OpenNIBone*>::iterator it = mBoneList.begin(); it != mBoneList.end(); ++it, index++ )
-			{
-				OpenNIBone* bone = *it;
-
-
-				// Bail out in case any bone is not confident
-				if( bone->positionConfidence < 0.5f || bone->orientationConfidence < 0.5f )
-					break;
-
-				XnPoint3D point;
-				point.X = bone->positionProjective[0];
-				point.Y = bone->positionProjective[1];
-				point.Z = bone->positionProjective[2];
-				// Convert a point from world coordinates to screen coordinates
-				//XnPoint3D point;
-				//XnPoint3D realJointPos;
-				//realJointPos.X = bone->position[0];
-				//realJointPos.Y = bone->position[1];
-				//realJointPos.Z = bone->position[2];
-				//depth->ConvertRealWorldToProjective( 1, &realJointPos, &point );
-				point.X *= 0.0015625f;			// div by 640
-				point.Y *= 0.00208333333333333333333333333333f;			// div by 480
-				float sx = pointSize;
-				float sy = pointSize;
-				if( bone->id == SKEL_TORSO )
-				{
-					sx *= 2;
-					sy *= 2;
-				}
-
-				if( bone->id == SKEL_TORSO )
-					glColor4f( 1, 0, 0, 1 );
-				else
-					glColor4f( 1, 1, 1, 1 );
-				if( renderDepth )
-				{
-					glVertex3f( -sx+(point.X*width), -sy+(point.Y*height), point.Z*depth );
-					glVertex3f(  sx+(point.X*width), -sy+(point.Y*height), point.Z*depth );
-					glVertex3f(  sx+(point.X*width),  sy+(point.Y*height), point.Z*depth );
-					glVertex3f( -sx+(point.X*width),  sy+(point.Y*height), point.Z*depth );
-
-				}
-				else
-				{
-					glVertex3f( -sx+(point.X*width), -sy+(point.Y*height), 0 );
-					glVertex3f(  sx+(point.X*width), -sy+(point.Y*height), 0 );
-					glVertex3f(  sx+(point.X*width),  sy+(point.Y*height), 0 );
-					glVertex3f( -sx+(point.X*width),  sy+(point.Y*height), 0 );
-				}
-			}
-			glEnd();
+//			// Old OpenGL rendering method. it's fine for now.
+//			//
+//			glBegin( GL_QUADS );
+//			int index = 1;
+//			for( std::vector<OpenNIBone*>::iterator it = mBoneList.begin(); it != mBoneList.end(); ++it, index++ )
+//			{
+//				OpenNIBone* bone = *it;
+//
+//
+//				// Bail out in case any bone is not confident
+//				if( bone->positionConfidence < 0.5f || bone->orientationConfidence < 0.5f )
+//					break;
+//
+//				XnPoint3D point;
+//				point.X = bone->positionProjective[0];
+//				point.Y = bone->positionProjective[1];
+//				point.Z = bone->positionProjective[2];
+//				// Convert a point from world coordinates to screen coordinates
+//				//XnPoint3D point;
+//				//XnPoint3D realJointPos;
+//				//realJointPos.X = bone->position[0];
+//				//realJointPos.Y = bone->position[1];
+//				//realJointPos.Z = bone->position[2];
+//				//depth->ConvertRealWorldToProjective( 1, &realJointPos, &point );
+//				point.X *= 0.0015625f;			// div by 640
+//				point.Y *= 0.00208333333333333333333333333333f;			// div by 480
+//				float sx = pointSize;
+//				float sy = pointSize;
+//				if( bone->id == SKEL_TORSO )
+//				{
+//					sx *= 2;
+//					sy *= 2;
+//				}
+//
+//				if( bone->id == SKEL_TORSO )
+//					glColor4f( 1, 0, 0, 1 );
+//				else
+//					glColor4f( 1, 1, 1, 1 );
+//				if( renderDepth )
+//				{
+//					glVertex3f( -sx+(point.X*width), -sy+(point.Y*height), point.Z*depth );
+//					glVertex3f(  sx+(point.X*width), -sy+(point.Y*height), point.Z*depth );
+//					glVertex3f(  sx+(point.X*width),  sy+(point.Y*height), point.Z*depth );
+//					glVertex3f( -sx+(point.X*width),  sy+(point.Y*height), point.Z*depth );
+//
+//				}
+//				else
+//				{
+//					glVertex3f( -sx+(point.X*width), -sy+(point.Y*height), 0 );
+//					glVertex3f(  sx+(point.X*width), -sy+(point.Y*height), 0 );
+//					glVertex3f(  sx+(point.X*width),  sy+(point.Y*height), 0 );
+//					glVertex3f( -sx+(point.X*width),  sy+(point.Y*height), 0 );
+//				}
+//			}
+//			glEnd();
 
 
 			//
@@ -727,32 +729,33 @@ namespace V
 				return;
 
 
-			// Old OpenGL rendering method. it's fine for now.
-			glBegin( GL_QUADS );
-			int index = 1;
-			for( OpenNIBoneList::iterator it = mBoneList.begin(); it != mBoneList.end(); ++it, index++ )
-			{
-				OpenNIBone* bone = *it;
-
-				// Convert a point from world coordinates to screen coordinates
-				XnPoint3D point;
-				point.X = bone->position[0];
-				point.Y = bone->position[1];
-				point.Z = bone->position[2] * zScale;
-				float sx = pointSize;
-				float sy = pointSize;
-
-				//std::stringstream ss;
-				//ss << "BONE ID: " << bone->id << "  --   " << point.X << ", " << point.Y << ", " << point.Z << std::endl;
-				//DEBUG_MESSAGE( ss.str().c_str() );
-
-				glColor4f( 1, 1, 1, 1 );
-				glVertex3f( -sx+point.X, -sy+point.Y, point.Z );
-				glVertex3f(  sx+point.X, -sy+point.Y, point.Z );
-				glVertex3f(  sx+point.X,  sy+point.Y, point.Z );
-				glVertex3f( -sx+point.X,  sy+point.Y, point.Z );
-			}
-			glEnd();
+            // TODO: Update to work with modern GL
+//			// Old OpenGL rendering method. it's fine for now.
+//			glBegin( GL_QUADS );
+//			int index = 1;
+//			for( OpenNIBoneList::iterator it = mBoneList.begin(); it != mBoneList.end(); ++it, index++ )
+//			{
+//				OpenNIBone* bone = *it;
+//
+//				// Convert a point from world coordinates to screen coordinates
+//				XnPoint3D point;
+//				point.X = bone->position[0];
+//				point.Y = bone->position[1];
+//				point.Z = bone->position[2] * zScale;
+//				float sx = pointSize;
+//				float sy = pointSize;
+//
+//				//std::stringstream ss;
+//				//ss << "BONE ID: " << bone->id << "  --   " << point.X << ", " << point.Y << ", " << point.Z << std::endl;
+//				//DEBUG_MESSAGE( ss.str().c_str() );
+//
+//				glColor4f( 1, 1, 1, 1 );
+//				glVertex3f( -sx+point.X, -sy+point.Y, point.Z );
+//				glVertex3f(  sx+point.X, -sy+point.Y, point.Z );
+//				glVertex3f(  sx+point.X,  sy+point.Y, point.Z );
+//				glVertex3f( -sx+point.X,  sy+point.Y, point.Z );
+//			}
+//			glEnd();
 
 
 			//
@@ -836,11 +839,12 @@ namespace V
 			point1.Z *= depth;
 			point2.Z *= depth;
 
-			glBegin( GL_LINES );
-			glColor4f( mColor[0], mColor[1], mColor[2], 1.0f );
-			glVertex3f( point1.X*width, point1.Y*height, (renderDepthInProjective)?point1.Z:0 );
-			glVertex3f( point2.X*width, point2.Y*height, (renderDepthInProjective)?point2.Z:0 );
-			glEnd();
+            // TODO: Update to work with modern GL
+//			glBegin( GL_LINES );
+//			glColor4f( mColor[0], mColor[1], mColor[2], 1.0f );
+//			glVertex3f( point1.X*width, point1.Y*height, (renderDepthInProjective)?point1.Z:0 );
+//			glVertex3f( point2.X*width, point2.Y*height, (renderDepthInProjective)?point2.Z:0 );
+//			glEnd();
 		}
 		else
 		{
@@ -856,11 +860,12 @@ namespace V
 			point2.Y = bone2->position[1];
 			point2.Z = bone2->position[2];
 
-			glBegin( GL_LINES );
-			glColor4f( mColor[0], mColor[1], mColor[2], 1.0f );
-			glVertex3f( point1.X, point1.Y, point1.Z );
-			glVertex3f( point2.X, point2.Y, point2.Z );
-			glEnd();
+            // TODO: Update to work with modern GL
+//			glBegin( GL_LINES );
+//			glColor4f( mColor[0], mColor[1], mColor[2], 1.0f );
+//			glVertex3f( point1.X, point1.Y, point1.Z );
+//			glVertex3f( point2.X, point2.Y, point2.Z );
+//			glEnd();
 		}
 	}
 

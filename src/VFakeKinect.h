@@ -10,11 +10,11 @@ namespace V {
         ~FakeKinect(){};
         
         using Kinect::setup;
-        void setup(const ci::Vec2i & _depthSize, const ci::Vec2i & _colorSize, int nodeTypeFlags);
+        void setup(const ci::ivec2 & _depthSize, const ci::ivec2 & _colorSize, int nodeTypeFlags);
         void update(){};
         
-        ci::ImageSourceRef getColorImage(){ return ci::ImageSourceRef(tex_Color); }
-        ci::ImageSourceRef getDepthImage(){ return ci::ImageSourceRef(tex_Depth); }
+        ci::ImageSourceRef getColorImage(){ return tex_Color->createSource(); }
+        ci::ImageSourceRef getDepthImage(){ return tex_Depth->createSource(); }
         
         class FakeDevice
         {

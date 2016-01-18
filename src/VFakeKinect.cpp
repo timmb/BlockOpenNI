@@ -5,7 +5,7 @@ using namespace std;
 
 namespace V {
 
-    void FakeKinect::setup(const ci::Vec2i & _depthSize, const ci::Vec2i & _colorSize, int nodeTypeFlags)
+    void FakeKinect::setup(const ci::ivec2 & _depthSize, const ci::ivec2 & _colorSize, int nodeTypeFlags)
     {
         depthSize = _depthSize;
         colorSize = _colorSize;
@@ -15,8 +15,8 @@ namespace V {
         Surface::Iter it = colorSurface.getIter();
         while ( it.line() ) {
             while ( it.pixel() ) {
-                Vec2i xy = it.getPos();
-                Colorf color = hsvToRGB(Vec3f((float)xy.x / (float)colorSize.x, 1.f, 1.f));
+                ivec2 xy = it.getPos();
+                Colorf color = hsvToRgb(vec3((float)xy.x / (float)colorSize.x, 1.f, 1.f));
                 it.r() = color.r * 255.f;
                 it.g() = color.g * 255.f;
                 it.b() = color.b * 255.f;
@@ -27,7 +27,7 @@ namespace V {
         it = depthSurface.getIter();
         while ( it.line() ) {
             while ( it.pixel() ) {
-                float depth = ((Vec2f)it.getPos()).distance((Vec2f)depthSize / 2.f) / ((Vec2f)depthSize).distance(Vec2f(0, 0)) * 255.f;
+                float depth = distance((vec2)it.getPos(),(vec2)depthSize / 2.f) / distance((vec2)depthSize, vec2(0, 0)) * 255.f;
                 it.r() = depth;
                 it.g() = depth;
                 it.b() = depth;
@@ -39,7 +39,7 @@ namespace V {
             }
         }
                 
-        tex_Color = gl::Texture(colorSurface);
-        tex_Depth = gl::Texture(depthSurface);
+        tex_Color = gl::Texture::create(colorSurface);
+        tex_Depth = gl::Texture::create(depthSurface);
     }
 }

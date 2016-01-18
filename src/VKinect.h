@@ -16,9 +16,9 @@ public:
     ~Kinect();
     
     virtual void setup();
-    virtual void setup(const ci::Vec2i & size);
-    virtual void setup(const ci::Vec2i & size, int nodeTypeFlags);
-    virtual void setup(const ci::Vec2i & _depthSize, const ci::Vec2i & _colorSize, int nodeTypeFlags);
+    virtual void setup(const ci::ivec2 & size);
+    virtual void setup(const ci::ivec2 & size, int nodeTypeFlags);
+    virtual void setup(const ci::ivec2 & _depthSize, const ci::ivec2 & _colorSize, int nodeTypeFlags);
     void update();
     
     void drawColor(const ci::Rectf &rect);
@@ -33,16 +33,16 @@ public:
 
     
     ci::ImageSourceRef getColorImage();
-    ci::ColorA8u getColorPixel(ci::Vec2i pixel);
+    ci::ColorA8u getColorPixel(ci::ivec2 pixel);
     ci::ImageSourceRef getUserImage(const int id);
     ci::ImageSourceRef getDepthImage();
     XnPoint3D * getDepthMapRealWorld();
     
-    ci::gl::Texture * getColorTexture() { return &tex_Color; };
-    ci::gl::Texture * getDepthTexture() { return &tex_Depth; };
+    ci::gl::TextureRef getColorTexture() { return tex_Color; };
+    ci::gl::TextureRef getDepthTexture() { return tex_Depth; };
     
-    ci::Vec2i getDepthSize() { return depthSize; };
-    ci::Vec2i getColorSize() { return colorSize; };
+    ci::ivec2 getDepthSize() { return depthSize; };
+    ci::ivec2 getColorSize() { return colorSize; };
     
     OpenNIDevice::Ref getDevice() { return device; };
     
@@ -51,16 +51,16 @@ public:
         User(Kinect & kinect, const int id) :
         kinect(kinect),
         id(id),
-        texture(ci::gl::Texture(kinect.depthSize.x, kinect.depthSize.y))
+        texture(ci::gl::Texture::create(kinect.depthSize.x, kinect.depthSize.y))
         {};
 
         ci::ImageSourceRef getImage() const;
         OpenNIUserRef getOpenNIUser() const;
-        ci::Vec3f getCenterOfMass( bool doProjectiveCoords=false ) const;
+        ci::vec3 getCenterOfMass( bool doProjectiveCoords=false ) const;
         
         int id;
         Kinect & kinect;
-        ci::gl::Texture texture;
+        ci::gl::TextureRef texture;
     };
     friend class User;
     
@@ -70,9 +70,9 @@ public:
 protected:
     OpenNIDeviceManager * manager;
     OpenNIDevice::Ref device;
-    ci::gl::Texture tex_Color, tex_Depth;
+    ci::gl::TextureRef tex_Color, tex_Depth;
     uint16_t * pixels;
-    ci::Vec2i depthSize, colorSize;
+    ci::ivec2 depthSize, colorSize;
     bool isDepthMapRealWorldUpdated;
 
 public:
